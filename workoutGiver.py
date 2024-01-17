@@ -1,50 +1,57 @@
 import random
-import daytime
+from datetime import date
 
-class Exercise:
-    def __init__(self, lifts, cardio):
-        self.lifts = lifts
-        self.cardio = cardio
-    
-    def getLifts(self):
-        return self.lifts
-    
-    def getCardio(self):
-        return self.cardio
-    
-    def addLift(self, newLift):
-        self.lifts.append(newLift)
-
-    def setCardio(self, newCardio):
-        self.cardio = newCardio
 
 class Coach:
     def __init__(self, exercise):
         self.exercise = exercise
         self.difficulty = 2
-    
+
     def giveWorkout(self):
-        print("Hello")
-        workout = {}
-        if len(self.exercise.lifts) >= 4:
-            for lift in self.exercise.lifts:
-                workout[lift] = str(1*self.difficulty) + " Sets of " + str(2*self.difficulty) + " Reps of " + lift + "."
+        workout = ""
+        if len(self.exercise) == 4:
+            for lift in self.exercise:
+                workout += str(1 * self.difficulty) + " Sets of " + str(
+                    2 * self.difficulty) + " Reps of " + lift + ". " + "\n"
         else:
-            for lift in self.exercise.lifts:
-                workout = "Run " + str(0.2*self.difficulty) + " miles, climb " + str(5*self.difficulty) + " flights of stairs on the stair climber, and do " + str(2*self.difficulty) + " miles on the bike."
-        print(workout)
+            workout = "Run " + str(0.2 * self.difficulty) + " miles." + "\n" + "Climb " + str(
+                5 * self.difficulty) + " flights of stairs on the stair climber." + "\n" + "Do " + str(
+                2 * self.difficulty) + " miles on the bike." + "\n"
+        return workout
+
 
 def main():
-    legDay = ["Barbell Squat", "Shoulder Shrugs", "Leg Curls", "Leg Pushdowns"]
-    chestDay = ["Bench Press", "Dumbell Flys", "Dips", "Cable Crossover"]
+    legDay = ["Barbell Squat", "Shoulder Shrugs", "Leg Curls", "Leg Push-downs"]
+    chestDay = ["Bench Press", "Dumbbell Fly's", "Dips", "Cable Crossover"]
     armDay = ["Barbell Curls", "EZ Barbell Curl", "Skull Crushers", "Close Grip Bench Press"]
-    backDay = ["Deadlift", "Lat Pull Downs", "Overhead Press", "Pull Ups"]
+    backDay = ["Dead-lift", "Lat Pull Downs", "Overhead Press", "Pull Ups"]
     cardioDay = ["Run", "Stair Climber", "Bike"]
     liftCombinations = [legDay, chestDay, armDay, backDay, cardioDay]
-    
-    cardio = "Treadmill"
-    exercise = Exercise(lifts, cardio)
-    coach = Coach(exercise)
-    coach.giveWorkout()
+    today = date.today()
+    dayOfWeek = today.weekday()
+    # The following block within the if statement should only be executed on Monday mornings
+    # which is a '0' in date.today()
+    if dayOfWeek == 2:
+        random.shuffle(liftCombinations)
+        scheduleFile = open("ww.txt", "w")
+        for lift in liftCombinations:
+            coach = Coach(lift)
+            workout = coach.giveWorkout()
+            scheduleFile.write(str(workout) + " <><><> " + "\n")
+        scheduleFile.close()
+    # The following block within the if statement should only be executed on weekdays
+    # which is '0' through '4' in date.today()
+    isWeekday = False
+    if dayOfWeek < 5:
+        isWeekday = True
+    if isWeekday:
+        scheduleFile = open("ww.txt", "r")
+        schedule = scheduleFile.read()
+        scheduleList = schedule.split("<><><>")
+        todaysWorkout = scheduleList[dayOfWeek]
+        print(todaysWorkout)
+        scheduleFile.close()
+        # TODO: Send today's workout as an email to myself
+
 
 main()
